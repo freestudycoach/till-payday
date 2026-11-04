@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wwomjULyDRxjAbP6osLhQuVyqYRdCa3jhOqhXHtuRxw='; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://freeforgood-apps.github.io/till-payday/selftest.html">
+<title>Till Payday has moved</title>
+<style>
+:root{--bg:#F4F6F8;--surface:#FFFFFF;--ink:#14181F;--muted:#545C69;--line:#D5DAE1;--accent:#0E6B64;--accent-ink:#FFFFFF;--warn:#9B2C1F;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1217;--surface:#171C23;--ink:#ECEFF3;--muted:#A3ACB9;--line:#2C3440;--accent:#5CC8BC;--accent-ink:#0B0F14;--warn:#FF9B8A;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+  padding:max(24px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+main{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px}
+h1{margin:0;font-size:1.6rem;line-height:1.2;letter-spacing:-.01em}
+h2{margin:0;font-size:1.15rem}
+p,ol{margin:0}
+ol{padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.muted{color:var(--muted);font-size:.95rem}
+.addr{font-weight:700;overflow-wrap:anywhere}
+.btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:52px;padding:0 18px;border-radius:14px;font:inherit;font-weight:700;text-decoration:none;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--warn);border-color:var(--line);font-weight:600}
+.btn:disabled{opacity:.5}
+textarea{width:100%;min-height:96px;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink);font:13px/1.4 ui-monospace,Menlo,monospace;resize:vertical}
+input{width:100%;min-height:52px;border:1px solid var(--muted);border-radius:12px;padding:0 14px;background:var(--surface);color:var(--ink);font:inherit;font-size:1.3rem;letter-spacing:.3em}
+form,#move{display:flex;flex-direction:column;gap:10px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.msg{min-height:1.5em;font-size:.95rem;font-weight:600}
+#pinMsg{color:var(--warn)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <h1>Till Payday has a new home</h1>
+    <p>Same free app, new address:</p>
+    <p class="addr">freeforgood-apps.github.io/<wbr>till-payday/selftest.html</p>
+    <a class="btn primary" href="https://freeforgood-apps.github.io/till-payday/selftest.html">Open the new Till Payday</a>
+    <p class="muted" id="auto">Taking you there now&hellip;</p>
+  </section>
+
+  <section class="card" id="saved" hidden aria-labelledby="savedH">
+    <h2 id="savedH">Your plan is still saved here</h2>
+    <p>Phones keep saved plans tied to the address, so the new Till Payday starts empty. It only takes a minute to bring yours along.</p>
+
+    <form id="gate" hidden>
+      <label for="pin">This plan has a PIN lock. Type your PIN to move it.</label>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
+      <button class="btn primary" id="pinGo" type="submit">Unlock</button>
+      <p class="msg" id="pinMsg" role="alert"></p>
+    </form>
+
+    <div id="move" hidden>
+      <ol>
+        <li>Tap <b>Copy my plan</b> below.</li>
+        <li>Open the new Till Payday with the button above.</li>
+        <li>In the new Till Payday, open the <b>Plan</b> tab, tap <b>Back up or restore my plan</b>, paste the code, then tap <b>Restore</b>.</li>
+      </ol>
+      <p class="muted">Use Till Payday from your Home Screen? Add the new one to your Home Screen first, open it from the new icon, and restore it there.</p>
+      <textarea id="code" readonly aria-label="Your plan as a backup code"></textarea>
+      <button class="btn primary" id="copy" type="button">Copy my plan</button>
+      <p class="msg" id="copyMsg" aria-live="polite"></p>
+      <p class="muted">Once it's in the new Till Payday, you can clear the old copy off this phone.</p>
+      <button class="btn danger" id="wipe" type="button">I've moved it. Delete the old copy</button>
+    </div>
+
+    <p id="done" hidden><b>Done.</b> The old copy is gone from this phone. Your plan lives at the new address now.</p>
+  </section>
+
+  <p class="muted" style="text-align:center">Till Payday is still free, private and made by one volunteer.</p>
+</main>
+<script>
+"use strict";
+(function () {
+  var C = {"slug": "till-payday", "name": "Till Payday", "target": "https://freeforgood-apps.github.io/till-payday/selftest.html", "key": "till-payday-v1", "prefixes": ["till-payday-"], "pin": true};
+  var $ = function (id) { return document.getElementById(id); };
+  var target = C.target;
+
+  // Tidy up: the old offline copy at this address is no longer needed
+  try {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.getRegistrations().then(function (rs) {
+      rs.forEach(function (r) { if (r.scope.indexOf("/" + C.slug + "/") >= 0) r.unregister(); });
+    }).catch(function () {});
+    if (window.caches) caches.keys().then(function (ks) {
+      ks.forEach(function (k) { if (k.indexOf(C.slug + "-") === 0) caches.delete(k); });
+    }).catch(function () {});
+  } catch (e) {}
+
+  function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  // Is there something worth bringing along?
+  var raw = read(C.key), data = null;
+  try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = null; }
+  function hasStuff(d) {
+    if (!d || typeof d !== "object") return false;
+    if (C.slug === "till-payday") return Array.isArray(d.incomes) && Array.isArray(d.bills) && !d.example;
+    var parts = ["u", "mix", "stats", "days", "miss", "tests", "cards", "essay"];
+    for (var i = 0; i < parts.length; i++) { var v = d[parts[i]]; if (v && typeof v === "object" && Object.keys(v).length) return true; }
+    return !!d.active;
+  }
+  if (!hasStuff(data)) { location.replace(target); return; }
+
+  // There is: show how to bring it along instead of forwarding
+  $("auto").hidden = true;
+  $("saved").hidden = false;
+
+  function toB64(str) {
+    var bytes = new TextEncoder().encode(str), bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function todayIso() { var t = new Date(); return t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()); }
+  // The same backup code each app makes for itself, so its Restore button takes it as is
+  function code() {
+    if (C.slug === "till-payday") return "TILLPAY1:" + toB64(JSON.stringify({ app: "Till Payday", format: 1, saved: todayIso(), plan: data }));
+    return "SC1." + toB64(JSON.stringify(data));
+  }
+
+  function showCode() {
+    $("gate").hidden = true;
+    $("move").hidden = false;
+    $("code").value = code();
+  }
+
+  // Till Payday's PIN lock: the same check the app uses, so a shared phone stays private
+  var pinCfg = null;
+  if (C.pin) { try { var c = JSON.parse(read(C.key + "-pin") || "null"); pinCfg = c && c.hash && c.salt ? c : null; } catch (e) { pinCfg = null; } }
+  var WAIT = C.key + "-pinwait";
+  function readWait() { try { var w = JSON.parse(read(WAIT) || "{}"); return { fails: w.fails | 0, until: +w.until || 0 }; } catch (e) { return { fails: 0, until: 0 }; } }
+  function writeWait(w) { try { localStorage.setItem(WAIT, JSON.stringify(w)); } catch (e) {} }
+  function b64Buf(t) { return Uint8Array.from(atob(t), function (ch) { return ch.charCodeAt(0); }); }
+  function bufB64(buf) { var b = new Uint8Array(buf), bin = ""; for (var i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]); return btoa(bin); }
+  function pinHash(pin, salt, iter) {
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]).then(function (base) {
+      return crypto.subtle.deriveBits({ name: "PBKDF2", salt: b64Buf(salt), iterations: iter, hash: "SHA-256" }, base, 256);
+    }).then(bufB64);
+  }
+  function waitMsg() {
+    var left = Math.ceil((readWait().until - Date.now()) / 1000);
+    $("pinMsg").textContent = left > 0 ? "Too many tries. Try again in " + left + " second" + (left === 1 ? "" : "s") + "." : "";
+    $("pinGo").disabled = left > 0;
+    if (left > 0) setTimeout(waitMsg, 1000);
+  }
+  if (pinCfg) {
+    $("gate").hidden = false;
+    waitMsg();
+    $("gate").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var w = readWait();
+      if (w.until > Date.now()) { waitMsg(); return; }
+      var pin = $("pin").value.trim();
+      var check = /^\d{4,8}$/.test(pin) ? pinHash(pin, pinCfg.salt, pinCfg.iter).then(function (h) { return h === pinCfg.hash; }, function () { return false; }) : Promise.resolve(false);
+      check.then(function (good) {
+        if (good) { writeWait({ fails: 0, until: 0 }); $("pinMsg").textContent = ""; showCode(); return; }
+        var fails = w.fails + 1;
+        var until = fails >= 5 ? Date.now() + Math.min(30000 * Math.pow(2, fails - 5), 300000) : 0;
+        writeWait({ fails: fails, until: until });
+        $("pin").value = "";
+        $("pinMsg").textContent = "That PIN isn't right.";
+        if (until) waitMsg();
+      });
+    });
+  } else {
+    showCode();
+  }
+
+  $("copy").addEventListener("click", function () {
+    var t = $("code"), msg = $("copyMsg");
+    function picked() { t.focus(); t.select(); t.setSelectionRange(0, t.value.length); msg.textContent = "The code is selected. Tap Copy from the menu."; }
+    try {
+      navigator.clipboard.writeText(t.value).then(function () { msg.textContent = "Copied. Now open the new " + C.name + " and restore it."; }, picked);
+    } catch (e) { picked(); }
+  });
+
+  // After moving: clear the old copy off this phone (two taps, so it can't happen by accident)
+  var armed = null;
+  $("wipe").addEventListener("click", function () {
+    if (!armed) {
+      $("wipe").textContent = "Tap again to delete the old copy";
+      armed = setTimeout(function () { armed = null; $("wipe").textContent = "I've moved it. Delete the old copy"; }, 5000);
+      return;
+    }
+    clearTimeout(armed); armed = null;
+    try {
+      var ks = [];
+      for (var i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i));
+      ks.forEach(function (k) { if (C.prefixes.some(function (p) { return k.indexOf(p) === 0; })) localStorage.removeItem(k); });
+    } catch (e) {}
+    $("move").hidden = true;
+    $("gate").hidden = true;
+    $("done").hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
